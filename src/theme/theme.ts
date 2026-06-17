@@ -1,0 +1,52 @@
+export const theme = {
+  colors: {
+    background: '#fbf9f4',
+    surface: '#ffffff',
+    surfaceMuted: '#f5f3ee',
+    surfaceTint: '#edf7f1',
+    text: '#1b1c19',
+    muted: '#5f6964',
+    primary: '#0b513d',
+    primaryStrong: '#003527',
+    primarySoft: '#b0f0d6',
+    accent: '#fe932c',
+    accentSoft: '#ffdcc3',
+    danger: '#c81e1e',
+    dangerSoft: '#ffebe7',
+    infoSoft: '#eef3f1',
+    border: '#d9ddd8',
+    outline: '#a6afaa',
+    white: '#ffffff',
+    overlay: 'rgba(14, 19, 17, 0.56)',
+  },
+  fonts: {
+    serifRegular: 'LibreCaslonText_400Regular',
+    serifBold: 'LibreCaslonText_700Bold',
+    sansRegular: 'BeVietnamPro_400Regular',
+    sansMedium: 'BeVietnamPro_500Medium',
+    sansSemiBold: 'BeVietnamPro_600SemiBold',
+    sansBold: 'BeVietnamPro_700Bold',
+  },
+  spacing: {
+    xs: 8,
+    sm: 12,
+    md: 16,
+    lg: 24,
+    xl: 32,
+    xxl: 40,
+    safe: 20,
+  },
+  radius: {
+    sm: 12,
+    md: 16,
+    lg: 24,
+    pill: 999,
+  },
+  shadow: {
+    card: '0px 14px 36px rgba(20, 25, 22, 0.06)',
+    soft: '0px 8px 24px rgba(20, 25, 22, 0.04)',
+    floating: '0px 12px 30px rgba(6, 78, 59, 0.12)',
+  },
+} as const;
+
+export type ThemeColor = keyof typeof theme.colors;
