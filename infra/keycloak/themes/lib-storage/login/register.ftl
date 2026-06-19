@@ -19,10 +19,8 @@
     <section class="ls-auth-card ls-auth-card-register">
       <div class="ls-auth-card-head">
         <div>
-          <span class="ls-auth-eyebrow">${msg("studentRoleLabel")}</span>
           <h2>${msg("registerStudentTitle")}</h2>
         </div>
-        <span class="ls-auth-pill">${msg("identityProviderLabel")}</span>
       </div>
 
       <#if message?has_content>

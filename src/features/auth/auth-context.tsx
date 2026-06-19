@@ -8,6 +8,10 @@ import { keycloakConfig } from './auth.config';
 import { clearAuthSession, loadAuthSession, saveAuthSession } from './auth.storage';
 import type { AuthSessionState } from './auth.types';
 import { buildSessionFromTokens, getRoleHomePath } from './auth.utils';
+import {
+  hasPersistedSystemUserForSession,
+  rememberSystemUserForSession,
+} from '@/services/mock-db/auth-session';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -19,7 +23,7 @@ type AuthContextValue = {
   isBusy: boolean;
   isReady: boolean;
   didCompleteRegistration: boolean;
-  signIn: () => Promise<void>;
+  signIn: (options?: { forcePrompt?: boolean }) => Promise<void>;
   signUp: () => Promise<void>;
   signOut: () => Promise<void>;
   clearRegistrationNotice: () => void;
@@ -99,6 +103,10 @@ function readWebAuthRequest() {
   } catch {
     return null;
   }
+}
+
+export function readPendingWebAuthFlow() {
+  return readWebAuthRequest()?.flow ?? null;
 }
 
 function clearWebAuthRequest() {
@@ -182,9 +190,31 @@ export function AuthProvider({ children }: PropsWithChildren) {
     createRequestConfig(),
     discovery,
   );
+  const [promptedLoginRequest, , promptPromptedLogin] = AuthSession.useAuthRequest(
+    createRequestConfig({ prompt: 'login' }),
+    discovery,
+  );
   const [registerRequest, registerResponse, promptRegister] = AuthSession.useAuthRequest(
     createRequestConfig({ kc_action: 'register' }),
     discovery,
+  );
+
+  const invalidateSession = useCallback(
+    async (input?: { session?: AuthSessionState | null; logoutFromIdentityProvider?: boolean }) => {
+      await clearAuthSession();
+      clearWebAuthRequest();
+      setDidCompleteRegistration(false);
+      setSession(null);
+
+      if (input?.logoutFromIdentityProvider) {
+        redirectToKeycloakLogout({
+          endSessionEndpoint: discovery?.endSessionEndpoint,
+          idToken: input.session?.idToken,
+          fallbackUrl: getWebLoginRoute(),
+        });
+      }
+    },
+    [discovery?.endSessionEndpoint],
   );
 
   useEffect(() => {
@@ -198,6 +228,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
       }
 
       if (!stored) {
+        setIsHydrating(false);
+        return;
+      }
+
+      if (!(await hasPersistedSystemUserForSession(stored))) {
+        await invalidateSession({ session: stored, logoutFromIdentityProvider: true });
         setIsHydrating(false);
         return;
       }
@@ -225,11 +261,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
           expiresIn: refreshed.expiresIn,
         });
 
+        if (!(await hasPersistedSystemUserForSession(nextSession))) {
+          await invalidateSession({ session: nextSession, logoutFromIdentityProvider: true });
+          return;
+        }
+
         await saveAuthSession(nextSession);
         setSession(nextSession);
       } catch {
-        await clearAuthSession();
-        setSession(null);
+        await invalidateSession();
       } finally {
         if (isMounted) {
           setIsHydrating(false);
@@ -242,7 +282,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => {
       isMounted = false;
     };
-  }, [discovery?.tokenEndpoint]);
+  }, [discovery?.tokenEndpoint, invalidateSession]);
 
   const clearRegistrationNotice = useCallback(() => {
     setDidCompleteRegistration(false);
@@ -310,6 +350,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
           expiresIn: tokens.expiresIn,
         });
 
+        await rememberSystemUserForSession(nextSession);
+
+        if (!(await hasPersistedSystemUserForSession(nextSession))) {
+          await invalidateSession({ session: nextSession, logoutFromIdentityProvider: true });
+          return;
+        }
+
         await saveAuthSession(nextSession);
         setSession(nextSession);
       } finally {
@@ -318,7 +365,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
 
     consumeResponse(loginResponse, loginRequest);
-  }, [discovery?.tokenEndpoint, loginRequest, loginResponse]);
+  }, [discovery?.tokenEndpoint, invalidateSession, loginRequest, loginResponse]);
 
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -369,8 +416,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
     consumeResponse(registerResponse, registerRequest);
   }, [completeRegistrationFlow, discovery?.tokenEndpoint, registerRequest, registerResponse]);
 
-  const signIn = useCallback(async () => {
-    if (!loginRequest || !discovery) {
+  const signIn = useCallback(async (options?: { forcePrompt?: boolean }) => {
+    const shouldForcePrompt = Boolean(options?.forcePrompt);
+    const activeRequest = shouldForcePrompt ? promptedLoginRequest : loginRequest;
+    const activePrompt = shouldForcePrompt ? promptPromptedLogin : promptLogin;
+
+    if (!activeRequest || !discovery) {
       return;
     }
 
@@ -378,19 +429,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     try {
       if (Platform.OS === 'web') {
-        const url = await loginRequest.makeAuthUrlAsync(discovery);
-        saveWebAuthRequest(loginRequest, 'login');
+        const url = await activeRequest.makeAuthUrlAsync(discovery);
+        saveWebAuthRequest(activeRequest, 'login');
         window.location.assign(url);
         return;
       }
 
-      await promptLogin();
+      await activePrompt();
     } catch (error) {
       console.warn('Unable to open Keycloak login session.', error);
     } finally {
       setIsBusy(false);
     }
-  }, [discovery, loginRequest, promptLogin]);
+  }, [discovery, loginRequest, promptLogin, promptPromptedLogin, promptedLoginRequest]);
 
   const signUp = useCallback(async () => {
     if (!registerRequest || !discovery) {
@@ -464,6 +515,21 @@ export function AuthProvider({ children }: PropsWithChildren) {
         );
 
         if (storedRequest.flow === 'register') {
+          try {
+            const registeredSession = buildSessionFromTokens({
+              accessToken: tokens.accessToken,
+              refreshToken: tokens.refreshToken,
+              idToken: tokens.idToken,
+              expiresIn: tokens.expiresIn,
+            });
+
+            await rememberSystemUserForSession(registeredSession);
+          } catch (error) {
+            if (!isMissingSupportedRoleError(error)) {
+              throw error;
+            }
+          }
+
           const redirected = await completeRegistrationFlow({ idToken: tokens.idToken });
 
           return {
@@ -483,19 +549,29 @@ export function AuthProvider({ children }: PropsWithChildren) {
           });
         } catch (error) {
           if (isMissingSupportedRoleError(error)) {
-            await completeRegistrationFlow({ idToken: tokens.idToken });
-            return {
-              redirectTo: '/login?registered=1',
-              status: 'registration_complete' as const,
-            };
+            clearWebAuthRequest();
+            throw new Error(
+              'Tai khoan cua ban chua duoc cap role student hoac librarian trong he thong.',
+            );
           }
 
           throw error;
         }
 
+        await rememberSystemUserForSession(nextSession);
+
+        if (!(await hasPersistedSystemUserForSession(nextSession))) {
+          await invalidateSession({ session: nextSession, logoutFromIdentityProvider: true });
+          return {
+            redirectTo: '/login',
+            status: 'signed_in' as const,
+          };
+        }
+
         await saveAuthSession(nextSession);
         clearWebAuthRequest();
         setSession(nextSession);
+
         return {
           redirectTo: getRoleHomePath(nextSession.role),
           status: 'signed_in' as const,
@@ -504,8 +580,32 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setIsBusy(false);
       }
     },
-    [completeRegistrationFlow, discovery?.tokenEndpoint, session],
+    [completeRegistrationFlow, discovery?.tokenEndpoint, invalidateSession, session],
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function validateSession() {
+      if (!session) {
+        return;
+      }
+
+      const exists = await hasPersistedSystemUserForSession(session);
+
+      if (!isMounted || exists) {
+        return;
+      }
+
+      await invalidateSession({ session, logoutFromIdentityProvider: true });
+    }
+
+    void validateSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [invalidateSession, session]);
 
   const signOut = useCallback(async () => {
     const fallbackLoginRoute = getWebLoginRoute();
@@ -547,7 +647,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       session,
       isHydrating,
       isBusy,
-      isReady: Boolean(discovery && loginRequest),
+      isReady: Boolean(discovery && loginRequest && promptedLoginRequest),
       didCompleteRegistration,
       signIn,
       signUp,
@@ -563,6 +663,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       isBusy,
       isHydrating,
       loginRequest,
+      promptedLoginRequest,
       session,
       signIn,
       signOut,

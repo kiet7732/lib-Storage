@@ -18,10 +18,8 @@
     <section class="ls-auth-card">
       <div class="ls-auth-card-head">
         <div>
-          <span class="ls-auth-eyebrow">${msg("ssoLabel")}</span>
           <h2>${msg("continueLoginTitle")}</h2>
         </div>
-        <span class="ls-auth-pill">${msg("identityProviderLabel")}</span>
       </div>
 
       <div class="ls-auth-actions">

@@ -18,10 +18,8 @@
     <section class="ls-auth-card ls-auth-card-login">
       <div class="ls-auth-card-head">
         <div>
-          <span class="ls-auth-eyebrow">${msg("ssoLabel")}</span>
           <h2>${msg("loginAccountTitle")}</h2>
         </div>
-        <span class="ls-auth-pill">${msg("identityProviderLabel")}</span>
       </div>
 
       <#if message?has_content>
@@ -88,7 +86,7 @@
       <#if realm.registrationAllowed && !registrationDisabled??>
         <div class="ls-auth-footer">
           <span>${msg("noAccount")}</span>
-          <a href="${url.registrationUrl}">${msg("doRegister")}</a>
+          <a id="ls-register-link" href="${url.registrationUrl}">${msg("doRegister")}</a>
         </div>
       </#if>
     </section>
@@ -102,10 +100,51 @@
     (function () {
       var form = document.getElementById('kc-form-login');
       var button = document.getElementById('kc-login');
+      var registerLink = document.getElementById('ls-register-link');
       var isSubmitting = false;
 
       if (!form) {
         return;
+      }
+
+      if (registerLink) {
+        try {
+          var currentParams = new URLSearchParams(window.location.search);
+          var shouldOpenRegister = currentParams.get('kc_action') === 'register';
+          var defaultRegisterHref = registerLink.getAttribute('href') || '';
+          var redirectUri = currentParams.get('redirect_uri') || '';
+
+          if (!redirectUri) {
+            var registerUrlParams = new URL(defaultRegisterHref, window.location.origin).searchParams;
+            var clientDataParam = registerUrlParams.get('client_data');
+
+            if (clientDataParam) {
+              var normalized = clientDataParam.replace(/-/g, '+').replace(/_/g, '/');
+
+              while (normalized.length % 4 !== 0) {
+                normalized += '=';
+              }
+
+              var clientData = JSON.parse(window.atob(normalized));
+              redirectUri = clientData && typeof clientData.ru === 'string' ? clientData.ru : '';
+            }
+          }
+
+          if (/^https?:\/\//i.test(redirectUri)) {
+            var registerAppUrl = new URL(redirectUri);
+            registerAppUrl.pathname = '/register';
+            registerAppUrl.search = '';
+            registerAppUrl.hash = '';
+            registerLink.setAttribute('href', registerAppUrl.toString());
+          }
+
+          if (shouldOpenRegister && defaultRegisterHref) {
+            window.location.replace(defaultRegisterHref);
+            return;
+          }
+        } catch (error) {
+          console.warn('Unable to remap registration link.', error);
+        }
       }
 
       form.addEventListener('submit', function (event) {
