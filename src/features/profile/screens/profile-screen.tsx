@@ -1,11 +1,12 @@
 import { Image } from 'expo-image';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { AppScrollScreen } from '@/components/ui/app-scroll-screen';
 import { AppText } from '@/components/ui/app-text';
 import { StatusChip } from '@/components/ui/status-chip';
+import { useAuth } from '@/features/auth/auth-context';
 import { studentProfile } from '@/services/library';
 import { useResponsiveLayout } from '@/theme/responsive';
 import { theme } from '@/theme/theme';
@@ -13,6 +14,7 @@ import { successHaptic } from '@/utils/haptics';
 
 export function ProfileScreen() {
   const layout = useResponsiveLayout();
+  const { signOut } = useAuth();
 
   return (
     <AppScrollScreen>
@@ -90,7 +92,7 @@ export function ProfileScreen() {
           <Pressable
             onPress={async () => {
               await successHaptic();
-              router.replace('/login');
+              await signOut();
             }}
           >
             {({ pressed }) => (

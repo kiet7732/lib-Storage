@@ -1,4 +1,4 @@
-﻿import { assertMockDatabaseIntegrity } from "./integrity";
+import { assertMockDatabaseIntegrity } from "./integrity";
 import type { MockDatabaseTables, TableDefinition } from "./types";
 
 export const tableDefinitions: Record<
@@ -6,12 +6,12 @@ export const tableDefinitions: Record<
   TableDefinition
 > = {
   roles: {
-    description: "Danh sÃ¡ch role cá»§a há»‡ thá»‘ng",
+    description: "Danh sách role của hệ thống",
     primaryKey: "id",
     columns: ["id", "code", "name"],
   },
   users: {
-    description: "TÃ i khoáº£n dÃ¹ng chung cho má»i role",
+    description: "Tài khoản dùng chung cho mọi role",
     primaryKey: "id",
     columns: [
       "id",
@@ -24,12 +24,12 @@ export const tableDefinitions: Record<
     ],
   },
   branches: {
-    description: "Chi nhÃ¡nh thÆ° viá»‡n hoáº·c khu lÆ°u trá»¯",
+    description: "Chi nhánh thư viện hoặc khu lưu trữ",
     primaryKey: "id",
     columns: ["id", "name", "campus", "address"],
   },
   students: {
-    description: "Há»“ sÆ¡ nghiá»‡p vá»¥ cá»§a sinh viÃªn",
+    description: "Hồ sơ nghiệp vụ của sinh viên",
     primaryKey: "id",
     columns: [
       "id",
@@ -45,12 +45,12 @@ export const tableDefinitions: Record<
     ],
   },
   librarians: {
-    description: "Há»“ sÆ¡ nghiá»‡p vá»¥ cá»§a thá»§ thÆ°",
+    description: "Hồ sơ nghiệp vụ của thủ thư",
     primaryKey: "id",
     columns: ["id", "userId", "employeeCode", "branchId", "shiftLabel"],
   },
   books: {
-    description: "Äáº§u sÃ¡ch gá»‘c cá»§a thÆ° viá»‡n",
+    description: "Đầu sách gốc của thư viện",
     primaryKey: "id",
     columns: [
       "id",
@@ -64,27 +64,27 @@ export const tableDefinitions: Record<
     ],
   },
   categories: {
-    description: "Danh má»¥c phÃ¢n loáº¡i sÃ¡ch",
+    description: "Danh mục phân loại sách",
     primaryKey: "id",
     columns: ["id", "label"],
   },
   bookCategories: {
-    description: "Báº£ng ná»‘i nhiá»u-nhiá»u giá»¯a sÃ¡ch vÃ  danh má»¥c",
+    description: "Bảng nối nhiều-nhiều giữa sách và danh mục",
     primaryKey: "id",
     columns: ["id", "bookId", "categoryId"],
   },
   bookCopies: {
-    description: "Tá»«ng báº£n sao váº­t lÃ½ cá»§a sÃ¡ch trong kho",
+    description: "Từng bản sao vật lý của sách trong kho",
     primaryKey: "id",
     columns: ["id", "bookId", "branchId", "copyCode", "shelfCode", "status"],
   },
   recommendations: {
-    description: "Danh sÃ¡ch gá»£i Ã½ Ä‘áº§u sÃ¡ch theo ngÆ°á»i dÃ¹ng",
+    description: "Danh sách gợi ý đầu sách theo người dùng",
     primaryKey: "id",
     columns: ["id", "userId", "bookId", "rank"],
   },
   borrowRequests: {
-    description: "Phiáº¿u workflow mÆ°á»£n sÃ¡ch hoáº·c gia háº¡n",
+    description: "Phiếu workflow mượn sách hoặc gia hạn",
     primaryKey: "id",
     columns: [
       "id",
@@ -99,7 +99,7 @@ export const tableDefinitions: Record<
     ],
   },
   loans: {
-    description: "Phiáº¿u mÆ°á»£n thá»±c táº¿ gáº¯n vá»›i báº£n sao sÃ¡ch",
+    description: "Phiếu mượn thực tế gắn với bản sao sách",
     primaryKey: "id",
     columns: [
       "id",
@@ -116,12 +116,12 @@ export const tableDefinitions: Record<
     ],
   },
   loanHistories: {
-    description: "Nháº­t kÃ½ giao dá»‹ch mÆ°á»£n tráº£",
+    description: "Nhật ký giao dịch mượn trả",
     primaryKey: "id",
     columns: ["id", "loanId", "bookId", "eventType", "date", "note", "effectiveDueDate"],
   },
   notifications: {
-    description: "ThÃ´ng bÃ¡o gá»­i tá»›i ngÆ°á»i dÃ¹ng",
+    description: "Thông báo gửi tới người dùng",
     primaryKey: "id",
     columns: [
       "id",
@@ -137,7 +137,7 @@ export const tableDefinitions: Record<
     ],
   },
   activityLogs: {
-    description: "Hoáº¡t Ä‘á»™ng gáº§n Ä‘Ã¢y trong dashboard thá»§ thÆ°",
+    description: "Hoạt động gần đây trong dashboard thủ thư",
     primaryKey: "id",
     columns: [
       "id",
@@ -154,12 +154,12 @@ export const tableDefinitions: Record<
     ],
   },
   reportTemplates: {
-    description: "Máº«u bÃ¡o cÃ¡o Jasper hoáº·c bÃ¡o cÃ¡o ná»™i bá»™",
+    description: "Mẫu báo cáo Jasper hoặc báo cáo nội bộ",
     primaryKey: "id",
     columns: ["id", "title", "description", "badge", "icon"],
   },
   reportJobs: {
-    description: "Lá»‹ch sá»­ hÃ ng Ä‘á»£i xuáº¥t file bÃ¡o cÃ¡o",
+    description: "Lịch sử hàng đợi xuất file báo cáo",
     primaryKey: "id",
     columns: [
       "id",
@@ -191,7 +191,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
     {
       id: "user-student-nam",
       roleId: "role-student",
-      fullName: "Nguyá»…n VÄƒn Nam",
+      fullName: "Nguyễn Văn Nam",
       email: "sv123456@tdmu.edu.vn",
       phone: "0901234567",
       avatarUrl: "https://i.pravatar.cc/240?img=12",
@@ -200,7 +200,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
     {
       id: "user-student-a",
       roleId: "role-student",
-      fullName: "Nguyá»…n VÄƒn A",
+      fullName: "Nguyễn Văn A",
       email: "nguyenvana@tdmu.edu.vn",
       phone: "0900000001",
       avatarUrl: "https://i.pravatar.cc/240?img=31",
@@ -209,7 +209,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
     {
       id: "user-student-b",
       roleId: "role-student",
-      fullName: "Tráº§n Thá»‹ B",
+      fullName: "Trần Thị B",
       email: "tranthib@tdmu.edu.vn",
       phone: "0900000002",
       avatarUrl: "https://i.pravatar.cc/240?img=32",
@@ -218,7 +218,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
     {
       id: "user-student-le-b",
       roleId: "role-student",
-      fullName: "LÃª Thá»‹ B",
+      fullName: "Lê Thị B",
       email: "lethib@tdmu.edu.vn",
       phone: "0900000003",
       avatarUrl: "https://i.pravatar.cc/240?img=33",
@@ -227,7 +227,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
     {
       id: "user-student-tran-c",
       roleId: "role-student",
-      fullName: "Tráº§n Minh C",
+      fullName: "Trần Minh C",
       email: "tranminhc@tdmu.edu.vn",
       phone: "0900000004",
       avatarUrl: "https://i.pravatar.cc/240?img=34",
@@ -236,7 +236,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
     {
       id: "user-student-le-qd",
       roleId: "role-student",
-      fullName: "LÃª Quá»‘c D",
+      fullName: "Lê Quốc D",
       email: "lequocd@tdmu.edu.vn",
       phone: "0900000005",
       avatarUrl: "https://i.pravatar.cc/240?img=35",
@@ -245,7 +245,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
     {
       id: "user-librarian-minh",
       roleId: "role-librarian",
-      fullName: "Thá»§ thÆ° Minh",
+      fullName: "Thủ thư Minh",
       email: "librarian.minh@tdmu.edu.vn",
       phone: "0912345678",
       avatarUrl: "https://i.pravatar.cc/240?img=14",
@@ -254,7 +254,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
     {
       id: "user-admin-thao",
       roleId: "role-admin",
-      fullName: "Admin Tháº£o",
+      fullName: "Admin Thảo",
       email: "admin.thao@tdmu.edu.vn",
       phone: "0987654321",
       avatarUrl: "https://i.pravatar.cc/240?img=25",
@@ -264,9 +264,9 @@ export const mockDatabaseSeed: MockDatabaseTables = {
   branches: [
     {
       id: "branch-central",
-      name: "ThÆ° viá»‡n Trung tÃ¢m",
+      name: "Thư viện Trung tâm",
       campus: "tdmu HCM",
-      address: "LÃ´ E2a-7, ÄÆ°á»ng D1, Khu CÃ´ng nghá»‡ cao, TP.HCM",
+      address: "Lô E2a-7, Đường D1, Khu Công nghệ cao, TP.HCM",
     },
   ],
   students: [
@@ -274,8 +274,8 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       id: "student-1",
       userId: "user-student-nam",
       studentCode: "SV123456",
-      faculty: "ChÃ­nh quy",
-      program: "Ká»¹ thuáº­t pháº§n má»m",
+      faculty: "Chính quy",
+      program: "Kỹ thuật phần mềm",
       campus: "tdmu HCM",
       residence: "KTX Khu B",
       yearlyGoal: 20,
@@ -286,8 +286,8 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       id: "student-2",
       userId: "user-student-a",
       studentCode: "SV2021001",
-      faculty: "ChÃ­nh quy",
-      program: "Ká»¹ thuáº­t pháº§n má»m",
+      faculty: "Chính quy",
+      program: "Kỹ thuật phần mềm",
       campus: "tdmu HCM",
       residence: "KTX Khu A",
       yearlyGoal: 18,
@@ -298,10 +298,10 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       id: "student-3",
       userId: "user-student-b",
       studentCode: "SV20215678",
-      faculty: "ChÃ­nh quy",
-      program: "Há»‡ thá»‘ng thÃ´ng tin",
+      faculty: "Chính quy",
+      program: "Hệ thống thông tin",
       campus: "tdmu HCM",
-      residence: "NgoÃ¡ÂºÂ¡i trÃƒÂº",
+      residence: "Ngoại trú",
       yearlyGoal: 16,
       booksRead: 7,
       currentBorrowLimit: 5,
@@ -310,8 +310,8 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       id: "student-4",
       userId: "user-student-le-b",
       studentCode: "SV2022450",
-      faculty: "ChÃ­nh quy",
-      program: "Kinh doanh quá»‘c táº¿",
+      faculty: "Chính quy",
+      program: "Kinh doanh quốc tế",
       campus: "tdmu HCM",
       residence: "KTX Khu C",
       yearlyGoal: 14,
@@ -322,10 +322,10 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       id: "student-5",
       userId: "user-student-tran-c",
       studentCode: "SV2020881",
-      faculty: "ChÃ­nh quy",
-      program: "Thiáº¿t káº¿ tráº£i nghiá»‡m",
+      faculty: "Chính quy",
+      program: "Thiết kế trải nghiệm",
       campus: "tdmu HCM",
-      residence: "NgoÃ¡ÂºÂ¡i trÃƒÂº",
+      residence: "Ngoại trú",
       yearlyGoal: 15,
       booksRead: 8,
       currentBorrowLimit: 5,
@@ -334,8 +334,8 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       id: "student-6",
       userId: "user-student-le-qd",
       studentCode: "SV2022552",
-      faculty: "ChÃ­nh quy",
-      program: "Khoa há»c dá»¯ liá»‡u",
+      faculty: "Chính quy",
+      program: "Khoa học dữ liệu",
       campus: "tdmu HCM",
       residence: "KTX Khu D",
       yearlyGoal: 20,
@@ -349,19 +349,19 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       userId: "user-librarian-minh",
       employeeCode: "LIB102",
       branchId: "branch-central",
-      shiftLabel: "Ca: SÃ¡ng",
+      shiftLabel: "Ca: Sáng",
     },
   ],
   books: [
     {
       id: "machine-learning-mo-rong",
-      title: "Machine Learning Má»Ÿ Rá»™ng",
-      author: "Tráº§n VÅ© HoÃ ng",
-      publisher: "NXB Tráº»",
+      title: "Machine Learning Mở Rộng",
+      author: "Trần Vũ Hoàng",
+      publisher: "NXB Trẻ",
       year: 2023,
       isbn: "978-604-1-23456-7",
       summary:
-        "Cuá»‘n sÃ¡ch há»‡ thá»‘ng hÃ³a cÃ¡c thuáº­t toÃ¡n machine learning hiá»‡n Ä‘áº¡i, tá»« ná»n táº£ng Ä‘áº¿n NLP vÃ  thá»‹ giÃ¡c mÃ¡y tÃ­nh.",
+        "Cuốn sách hệ thống hóa các thuật toán machine learning hiện đại, từ nền tảng đến NLP và thị giác máy tính.",
       coverUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuDgqhCRzWoN5iEWQ2aq02NRndeKD7h_bCCvlp4TzTaC3RDqiMGqj7TyZGRdRjEuJCDNGQj9VDOML1ZMt_qk6SUkBKunIV9bqRUBV2hPJWONot5CKrrLNjC7jhMtLan-d17w-eyVD3AorOIlIPiEbhcFEGdtnNkmvJjBV_QW-G7Zph0cqB4IpMdFHJjXa6qT88AVhkRJtCG2LUVQIi2Y3UDHA9BGNwKcX02N_ieu9-HC5IvnfxihCezsPVRqy42GqcEJqzyVro4AHLsY",
     },
@@ -373,43 +373,43 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       year: 2019,
       isbn: "978-0-13-235088-4",
       summary:
-        "TÃ i liá»‡u kinh Ä‘iá»ƒn vá» ká»¹ thuáº­t viáº¿t mÃ£ dá»… Ä‘á»c, dá»… báº£o trÃ¬ vÃ  cÃ³ cáº¥u trÃºc rÃµ rÃ ng.",
+        "Tài liệu kinh điển về kỹ thuật viết mã dễ đọc, dễ bảo trì và có cấu trúc rõ ràng.",
       coverUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuBki8jg_20owJbI4qJ0tHX0ih8XCnIhU2iTIQf8_Px8S0145d8t5Z_gKg_qqCB_6wcakaoZx6hPsj0kXQ38iSh1aJtNUnj27t625cUSOM4MgUbb_g3PTNTfHzL4NuqjrT9EPfyuSo2A7WoMQoOq5FZN7rOoKQsf68Rz_HilzAH2MnWXMWWWn1fuuDLII-mqIYpx479T-tZPKnJD6h6IDkWpIk_-lqD_4MQHYvLzYqGH6u1y1i7jrkIU1KuDCSw4yVEnCwrD9-Up_zTF",
     },
     {
       id: "deep-learning-co-ban",
-      title: "Deep Learning CÆ¡ Báº£n",
-      author: "LÃª VÄƒn A",
-      publisher: "ÄHQG TP.HCM",
+      title: "Deep Learning Cơ Bản",
+      author: "Lê Văn A",
+      publisher: "ĐHQG TP.HCM",
       year: 2022,
       isbn: "978-604-73-9988-1",
       summary:
-        "SÃ¡ch nháº­p mÃ´n deep learning vá»›i minh há»a trá»±c quan, perceptron, CNN vÃ  pipeline huáº¥n luyá»‡n mÃ´ hÃ¬nh.",
+        "Sách nhập môn deep learning với minh họa trực quan, perceptron, CNN và pipeline huấn luyện mô hình.",
       coverUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuALVfeTXqI8D74hjWIkHo_M5pWzQ-ldNMqoAb9VNmVuxUY7zzbt1B5i6sK6hOmvkSMkgMjdDQY1uApoBwg5MqdePBE7zcQwiOW6AziKVmGj96zLnaxfEkowDWdcNxKi6F26VvnTQxmMeHWncDjajaikjnrlwItWHAzHoojv4XFBlQ3dHCVR8vY0t0lfo5BIbX1MCeCehRj6LHTbWuHKpU4PFYVpto2yJK0LF6ViaQzm3tpOCebjfnsEpX-Kn1c1JN7IRh7U89oOMnSM",
     },
     {
       id: "vi-mach-ung-dung",
-      title: "Vi Máº¡ch á»¨ng Dá»¥ng",
-      author: "Nguyá»…n Thá»‹ B",
-      publisher: "NXB Khoa há»c",
+      title: "Vi Mạch Ứng Dụng",
+      author: "Nguyễn Thị B",
+      publisher: "NXB Khoa học",
       year: 2021,
       isbn: "978-604-77-5544-3",
       summary:
-        "Giá»›i thiá»‡u kiáº¿n trÃºc máº¡ch tÃ­ch há»£p, cÃ¡c á»©ng dá»¥ng IoT cÆ¡ báº£n vÃ  cÃ¡ch Ä‘á»c datasheet trong phÃ²ng lab.",
+        "Giới thiệu kiến trúc mạch tích hợp, các ứng dụng IoT cơ bản và cách đọc datasheet trong phòng lab.",
       coverUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuDhymAGPhKxq27u917CUF18_X17IdUpv6s-UPT8H9s5hxrcpghK56Z4_qLLY4_o9LZ585Eg2xD49pTUnGrdJGwR03yIJvOR0zAImyk4RPW_iQZcVK6scFsl4rwsuyULBgtm8JvBwILiIdELwdzhH_N6j55dRc4DWWISi7tYkR2X5K3wJx8xyCmKUt2cQkY8RgdK6K8aJ0jiiSryMCVEvx9wZJVoxXxwpeE-Y7-fFsj5A6MMUnFt96xqsGnMSlFCkPwhbD3PY79eH5Kd",
     },
     {
       id: "du-lieu-lon",
-      title: "Dá»¯ Liá»‡u Lá»›n",
-      author: "Pháº¡m VÄƒn C",
+      title: "Dữ Liệu Lớn",
+      author: "Phạm Văn C",
       publisher: "NXB CNTT",
       year: 2024,
       isbn: "978-604-80-2200-0",
       summary:
-        "KhÃ¡i quÃ¡t há»‡ sinh thÃ¡i dá»¯ liá»‡u lá»›n, pipeline ETL vÃ  cÃ¡c cÃ´ng cá»¥ phÃ¢n tÃ­ch dá»¯ liá»‡u á»Ÿ quy mÃ´ doanh nghiá»‡p.",
+        "Khái quát hệ sinh thái dữ liệu lớn, pipeline ETL và các công cụ phân tích dữ liệu ở quy mô doanh nghiệp.",
       coverUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuCnbKbXjeMvcw1wtnyFEIWnQ_vr5rW4Y0ACKTtrCj7qUcLoXVfi5Qea6Oyaq-5wVSR6UxEAtY5k4PVZt2hkfZsDoh1Sh4C8i1NsrT0YFD10IZipxdcHlPhkeD5Y8-rqmuzJZH9S4_Awv3SFsQwzp2b07Fdnviq4SpLtzdwKNSw6gePbLtCrozca0ygzo8CyQK3sFaJ9lBdjEbX_ozg7UL28W-bw3aoAO6tYGwtYlVW1gwUa6H76D_mBY7roKH1DHx2AT_oUFTdJ2jS8",
     },
@@ -421,7 +421,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       year: 2020,
       isbn: "978-0-13-670235-1",
       summary:
-        "CÃ¡c design pattern quen thuá»™c Ä‘Æ°á»£c diá»…n giáº£i theo cÃ¡ch Ã¡p dá»¥ng trong há»‡ thá»‘ng hiá»‡n Ä‘áº¡i.",
+        "Các design pattern quen thuộc được diễn giải theo cách áp dụng trong hệ thống hiện đại.",
       coverUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuATUTaSG6dkCsxW5OmUJqP3pWNt37EsvvlMr3U8SQfCxGrpvfJd_0A63Zd5Y9htb-7VF8Jtsf12Qa1akI-Yq6tGG_Ai77wEEaEcwkdwzkxkQs_i4cCcUMopft6g5c2EVzRGlE7584h77oJ73jEBEsUMhjzf26Vzt_zlUKrHhYoP41TpgA5-qUaSEszaM7jThNnOu1XrNMxaAFaXVyoIKhWW7xwnouSpgWJr5oQcMlcRZaaROLw2gFSlI65aTg3F3B_r-ryitYOEKukA",
     },
@@ -433,19 +433,19 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       year: 2018,
       isbn: "978-0-321-68368-7",
       summary:
-        "Khung tÆ° duy kinh Ä‘iá»ƒn cho viá»‡c tá»• chá»©c tráº£i nghiá»‡m ngÆ°á»i dÃ¹ng, tá»« chiáº¿n lÆ°á»£c sáº£n pháº©m Ä‘áº¿n lá»›p giao diá»‡n.",
+        "Khung tư duy kinh điển cho việc tổ chức trải nghiệm người dùng, từ chiến lược sản phẩm đến lớp giao diện.",
       coverUrl:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuBTVKI_ZId6u3dn9sQ6mou87jSDOiMoAKv41cY06ZGb5-XWnL_b8IkNHMqLYUI4LrSbjUJdpbLGba6_kmy5ztbeqosQNDUDU_rvzy_-UwhbCkKeGyzStk6HISblPsssifyxlo60iMlsJKSFBXNA2wIiuHIaF9dHoouQ38abH0RMp0UgoGLQq-RD2n6BJ4t1XxgUEEOfKGTl8Qvw-MlZbAOWRY6kujpcNB52HrGzyb5gzV9FaAbcWdVo75l0Vx2wBO2f6bv9GeV3WE0q",
     },
   ],
   categories: [
     { id: "cat-ai", label: "AI" },
-    { id: "cat-data", label: "Dá»¯ liá»‡u" },
+    { id: "cat-data", label: "Dữ liệu" },
     { id: "cat-software", label: "Software" },
     { id: "cat-architecture", label: "Architecture" },
     { id: "cat-design", label: "Design" },
     { id: "cat-ux", label: "UX" },
-    { id: "cat-hardware", label: "Pháº§n cá»©ng" },
+    { id: "cat-hardware", label: "Phần cứng" },
     { id: "cat-cloud", label: "Cloud" },
     { id: "cat-product", label: "Product" },
   ],
@@ -501,7 +501,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "vi-mach-ung-dung",
       branchId: "branch-central",
       copyCode: "PHI-101-C",
-      shelfCode: "Ká»‡ B2-12",
+      shelfCode: "Kệ B2-12",
       status: "damaged",
     },
     {
@@ -509,7 +509,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "machine-learning-mo-rong",
       branchId: "branch-central",
       copyCode: "ML-002-A",
-      shelfCode: "Ká»‡ A2-01",
+      shelfCode: "Kệ A2-01",
       status: "borrowed",
     },
     {
@@ -517,7 +517,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "clean-code",
       branchId: "branch-central",
       copyCode: "ECO-001-A",
-      shelfCode: "Ká»‡ A3-02",
+      shelfCode: "Kệ A3-02",
       status: "available",
     },
     {
@@ -525,7 +525,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "clean-code",
       branchId: "branch-central",
       copyCode: "CC-004-B",
-      shelfCode: "Ká»‡ B1-03",
+      shelfCode: "Kệ B1-03",
       status: "available",
     },
     {
@@ -533,7 +533,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "clean-code",
       branchId: "branch-central",
       copyCode: "CC-004-C",
-      shelfCode: "Ká»‡ B1-04",
+      shelfCode: "Kệ B1-04",
       status: "available",
     },
     {
@@ -541,7 +541,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "clean-code",
       branchId: "branch-central",
       copyCode: "CC-004-D",
-      shelfCode: "Ká»‡ B1-05",
+      shelfCode: "Kệ B1-05",
       status: "borrowed",
     },
     {
@@ -549,7 +549,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "deep-learning-co-ban",
       branchId: "branch-central",
       copyCode: "DL-003-A",
-      shelfCode: "Ká»‡ A5-02",
+      shelfCode: "Kệ A5-02",
       status: "available",
     },
     {
@@ -557,7 +557,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "vi-mach-ung-dung",
       branchId: "branch-central",
       copyCode: "VM-001-A",
-      shelfCode: "Ká»‡ D4-01",
+      shelfCode: "Kệ D4-01",
       status: "available",
     },
     {
@@ -565,7 +565,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "vi-mach-ung-dung",
       branchId: "branch-central",
       copyCode: "VM-001-B",
-      shelfCode: "Ká»‡ D4-02",
+      shelfCode: "Kệ D4-02",
       status: "available",
     },
     {
@@ -573,7 +573,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "vi-mach-ung-dung",
       branchId: "branch-central",
       copyCode: "VM-001-C",
-      shelfCode: "Ká»‡ D4-03",
+      shelfCode: "Kệ D4-03",
       status: "borrowed",
     },
     {
@@ -581,7 +581,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "du-lieu-lon",
       branchId: "branch-central",
       copyCode: "DLL-007-A",
-      shelfCode: "Ká»‡ B7-01",
+      shelfCode: "Kệ B7-01",
       status: "borrowed",
     },
     {
@@ -589,7 +589,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "design-patterns-modern-software",
       branchId: "branch-central",
       copyCode: "COM-204-B",
-      shelfCode: "Ká»‡ C1-05",
+      shelfCode: "Kệ C1-05",
       status: "borrowed",
     },
     {
@@ -597,7 +597,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "design-patterns-modern-software",
       branchId: "branch-central",
       copyCode: "DP-201-C",
-      shelfCode: "Ká»‡ C2-02",
+      shelfCode: "Kệ C2-02",
       status: "available",
     },
     {
@@ -605,7 +605,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "elements-of-user-experience",
       branchId: "branch-central",
       copyCode: "UX-001-A",
-      shelfCode: "Ká»‡ E3-01",
+      shelfCode: "Kệ E3-01",
       status: "borrowed",
     },
     {
@@ -613,7 +613,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "elements-of-user-experience",
       branchId: "branch-central",
       copyCode: "UX-001-B",
-      shelfCode: "Ká»‡ E3-02",
+      shelfCode: "Kệ E3-02",
       status: "available",
     },
     {
@@ -621,7 +621,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "elements-of-user-experience",
       branchId: "branch-central",
       copyCode: "UX-001-C",
-      shelfCode: "Ká»‡ E3-03",
+      shelfCode: "Kệ E3-03",
       status: "available",
     },
     {
@@ -629,7 +629,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "elements-of-user-experience",
       branchId: "branch-central",
       copyCode: "UX-001-D",
-      shelfCode: "Ká»‡ E3-04",
+      shelfCode: "Kệ E3-04",
       status: "available",
     },
     {
@@ -637,7 +637,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "elements-of-user-experience",
       branchId: "branch-central",
       copyCode: "UX-001-E",
-      shelfCode: "Ká»‡ E3-05",
+      shelfCode: "Kệ E3-05",
       status: "available",
     },
     {
@@ -645,7 +645,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       bookId: "machine-learning-mo-rong",
       branchId: "branch-central",
       copyCode: "ML-002-B",
-      shelfCode: "KÃ¡Â»â€¡ A2-02",
+      shelfCode: "Kệ A2-02",
       status: "borrowed",
     },
   ],
@@ -734,7 +734,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       dueDate: "15/10/2026",
       status: "due-soon",
       renewable: true,
-      note: "CÃ²n 2 ngÃ y",
+      note: "Còn 2 ngày",
     },
     {
       id: "loan-2",
@@ -746,7 +746,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       status: "overdue",
       renewable: false,
       fineAmount: 5000,
-      note: "QuÃ¡ háº¡n 3 ngÃ y",
+      note: "Quá hạn 3 ngày",
     },
     {
       id: "loan-3",
@@ -779,7 +779,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       status: "overdue",
       renewable: false,
       fineAmount: 50000,
-      note: "QuÃ¡ háº¡n 5 ngÃ y",
+      note: "Quá hạn 5 ngày",
     },
     {
       id: "loan-6",
@@ -791,7 +791,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       status: "overdue",
       renewable: false,
       fineAmount: 30000,
-      note: "QuÃ¡ háº¡n 3 ngÃ y",
+      note: "Quá hạn 3 ngày",
     },
     {
       id: "loan-7",
@@ -802,7 +802,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       dueDate: "16/10/2026",
       status: "due-soon",
       renewable: true,
-      note: "Ã„ÂÃ¡ÂºÂ¿n hÃ¡ÂºÂ¡n hÃƒÂ´m nay",
+      note: "Đến hạn hôm nay",
     },
     {
       id: "loan-8",
@@ -813,7 +813,7 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       dueDate: "16/10/2026",
       status: "due-soon",
       renewable: true,
-      note: "Ã„ÂÃ¡ÂºÂ¿n hÃ¡ÂºÂ¡n hÃƒÂ´m nay",
+      note: "Đến hạn hôm nay",
     },
   ],
   loanHistories: [
@@ -937,31 +937,31 @@ export const mockDatabaseSeed: MockDatabaseTables = {
   reportTemplates: [
     {
       id: "report-template-1",
-      title: "BÃ¡o cÃ¡o mÆ°á»£n tráº£",
-      description: "Thá»‘ng kÃª chi tiáº¿t sÃ¡ch Ä‘Æ°á»£c mÆ°á»£n vÃ  tráº£ láº¡i trong ká»³.",
-      badge: "HÃ ng ngÃ y",
+      title: "Báo cáo mượn trả",
+      description: "Thống kê chi tiết sách được mượn và trả lại trong kỳ.",
+      badge: "Hàng ngày",
       icon: "history",
     },
     {
       id: "report-template-2",
-      title: "BÃ¡o cÃ¡o quÃ¡ háº¡n",
+      title: "Báo cáo quá hạn",
       description:
-        "Danh sÃ¡ch báº¡n Ä‘á»c giá»¯ tÃ i liá»‡u vÆ°á»£t quÃ¡ thá»i gian quy Ä‘á»‹nh.",
-      badge: "Æ¯u tiÃªn cao",
+        "Danh sách bạn đọc giữ tài liệu vượt quá thời gian quy định.",
+      badge: "Ưu tiên cao",
       icon: "warning",
     },
     {
       id: "report-template-3",
-      title: "Thá»‘ng kÃª tiá»n pháº¡t",
-      description: "Tá»•ng há»£p cÃ¡c khoáº£n thu tá»« viá»‡c pháº¡t trá»… háº¡n vÃ  Ä‘á»n bÃ¹.",
-      badge: "TÃ i chÃ­nh",
+      title: "Thống kê tiền phạt",
+      description: "Tổng hợp các khoản thu từ việc phạt trễ hạn và đền bù.",
+      badge: "Tài chính",
       icon: "money",
     },
     {
       id: "report-template-4",
-      title: "BÃ¡o cÃ¡o lÆ°u thÃ´ng",
-      description: "ÄÃ¡nh giÃ¡ táº§n suáº¥t sá»­ dá»¥ng cá»§a cÃ¡c Ä‘áº§u má»¥c tÃ i liá»‡u.",
-      badge: "PhÃ¢n tÃ­ch",
+      title: "Báo cáo lưu thông",
+      description: "Đánh giá tần suất sử dụng của các đầu mục tài liệu.",
+      badge: "Phân tích",
       icon: "report",
     },
   ],
@@ -971,8 +971,8 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       templateId: "report-template-4",
       fileName: "Bao_cao_luu_thong_T10_2023.xlsx",
       createdByUserId: "user-admin-thao",
-      createdLabel: "HÃ´m nay, 14:30",
-      statusLabel: "HoÃ n thÃ nh",
+      createdLabel: "Hôm nay, 14:30",
+      statusLabel: "Hoàn thành",
       statusTone: "success",
       icon: "report",
     },
@@ -981,8 +981,8 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       templateId: "report-template-2",
       fileName: "Bao_cao_qua_han_W42.pdf",
       createdByUserId: "user-librarian-minh",
-      createdLabel: "HÃ´m qua, 09:15",
-      statusLabel: "HoÃ n thÃ nh",
+      createdLabel: "Hôm qua, 09:15",
+      statusLabel: "Hoàn thành",
       statusTone: "success",
       icon: "warning",
     },
@@ -991,8 +991,8 @@ export const mockDatabaseSeed: MockDatabaseTables = {
       templateId: "report-template-3",
       fileName: "Thong_ke_tien_phat_Q3.xlsx",
       createdByUserId: "user-admin-thao",
-      createdLabel: "Äang xá»­ lÃ½...",
-      statusLabel: "Äang táº¡o",
+      createdLabel: "Đang xử lý...",
+      statusLabel: "Đang tạo",
       statusTone: "warning",
       icon: "history",
     },

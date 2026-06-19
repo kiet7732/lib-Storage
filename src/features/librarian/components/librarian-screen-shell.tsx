@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { router } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
 import { AppIcon } from '@/components/ui/app-icon';
 import { AppText } from '@/components/ui/app-text';
 import { IconButton } from '@/components/ui/icon-button';
+import { useAuth } from '@/features/auth/auth-context';
 import { librarianProfile } from '@/services/library';
 import { useResponsiveLayout } from '@/theme/responsive';
 import { theme } from '@/theme/theme';
@@ -26,6 +26,7 @@ export function LibrarianScreenShell({
   children,
 }: LibrarianScreenShellProps) {
   const layout = useResponsiveLayout();
+  const { signOut } = useAuth();
   const stackIntro = layout.width < 460;
   const bottomClearance = Math.max(
     layout.bottomScrollPadding,
@@ -80,7 +81,7 @@ export function LibrarianScreenShell({
             variant="soft"
             onPress={async () => {
               await successHaptic();
-              router.replace('/login');
+              await signOut();
             }}
           >
             <AppIcon name="logout" color={theme.colors.danger} />
