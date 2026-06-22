@@ -1,23 +1,90 @@
+import { useState, useEffect } from 'react';
 import { Link, Stack, router, useLocalSearchParams } from 'expo-router';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, View, ActivityIndicator } from 'react-native';
 
 import { AppButton } from '@/components/ui/app-button';
 import { AppText } from '@/components/ui/app-text';
 import { StatusChip } from '@/components/ui/status-chip';
 import { BookCard } from '@/features/books/components/book-card';
 import { BookCover } from '@/features/books/components/book-cover';
-import { books, getBookById } from '@/services/library';
 import { useResponsiveLayout } from '@/theme/responsive';
 import { theme } from '@/theme/theme';
+import { Book } from '@/services/library/library.types';
 
 export function BookDetailScreen() {
   const layout = useResponsiveLayout();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const book = getBookById(id) ?? books[0];
-  const similarBooks = books.filter((entry) => entry.id !== book.id).slice(0, 3);
+  
+  const [book, setBook] = useState<Book | null>(null);
+  const [similarBooks, setSimilarBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const similarCoverHeight = Math.round(layout.smallCarouselCardWidth * 1.39);
 
+  const fetchBookDetails = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch book detail
+      const res = await fetch(`http://localhost:8088/api/books/${id}`);
+      if (!res.ok) throw new Error('Không tìm thấy sách này trong hệ thống');
+      const item = await res.json();
+      
+      const mappedBook: Book = {
+        id: item.id || "0-0",
+        title: item.title || "0-0",
+        author: item.author || "0-0",
+        publisher: item.publisher || "0-0",
+        year: item.year || 0,
+        isbn: item.isbn || "0-0",
+        coverUrl: item.coverUrl || "",
+        categories: item.categories?.map((c: any) => c.label) || ["0-0"],
+        summary: item.summary || "0-0",
+        copiesAvailable: 0,
+        location: "0-0"
+      };
+      
+      setBook(mappedBook);
+
+      // Fetch similar books (random 3 books)
+      const similarRes = await fetch(`http://localhost:8088/api/books?size=3`);
+      if (similarRes.ok) {
+        const similarJson = await similarRes.json();
+        if (similarJson.content) {
+          const mappedSimilar: Book[] = similarJson.content
+            .filter((sim: any) => sim.id !== id)
+            .map((sim: any) => ({
+              id: sim.id || "0-0",
+              title: sim.title || "0-0",
+              author: sim.author || "0-0",
+              publisher: sim.publisher || "0-0",
+              year: sim.year || 0,
+              isbn: sim.isbn || "0-0",
+              coverUrl: sim.coverUrl || "",
+              categories: sim.categories?.map((c: any) => c.label) || ["0-0"],
+              summary: sim.summary || "0-0",
+              copiesAvailable: 0,
+              location: "0-0"
+            }));
+          setSimilarBooks(mappedSimilar);
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Lỗi kết nối');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchBookDetails();
+    }
+  }, [id]);
+
   const handleBorrowPress = () => {
+    if (!book) return;
     router.push({
       pathname: '/borrow/request',
       params: {
@@ -27,6 +94,24 @@ export function BookDetailScreen() {
       },
     });
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
+        <Stack.Screen options={{ title: 'Đang tải...' }} />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
+  if (error || !book) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
+        <Stack.Screen options={{ title: 'Lỗi' }} />
+        <AppText tone="danger">{error || 'Không tìm thấy sách'}</AppText>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -68,7 +153,7 @@ export function BookDetailScreen() {
           >
             <AppText tone="muted">{book.publisher}</AppText>
             <AppText tone="muted">•</AppText>
-            <AppText tone="muted">{book.year}</AppText>
+            <AppText tone="muted">{book.year === 0 ? "0-0" : book.year}</AppText>
             <AppText tone="muted">•</AppText>
             <AppText
               tone="muted"
@@ -93,7 +178,7 @@ export function BookDetailScreen() {
               <StatusChip key={category} label={category} />
             ))}
             <StatusChip
-              label={`Còn ${book.copiesAvailable} cuốn`}
+              label={`Còn 0-0 cuốn`}
               tone="success"
               iconName="check-circle"
             />
@@ -118,7 +203,7 @@ export function BookDetailScreen() {
           <AppText variant="headline">Thông tin thư viện</AppText>
           <DetailRow label="Vị trí" value={book.location} />
           <DetailRow label="Phân loại" value={book.categories.join(', ')} />
-          <DetailRow label="Khả dụng" value={`${book.copiesAvailable} bản có thể mượn`} />
+          <DetailRow label="Khả dụng" value={`0-0 bản có thể mượn`} />
         </View>
 
         <View style={{ gap: theme.spacing.md }}>
@@ -153,6 +238,7 @@ export function BookDetailScreen() {
                   book={item}
                   coverWidth={layout.smallCarouselCardWidth}
                   coverHeight={similarCoverHeight}
+                  statusLabel={"0-0"}
                 />
               </View>
             ))}

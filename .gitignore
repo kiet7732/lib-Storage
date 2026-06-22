@@ -29,6 +29,8 @@ yarn-error.*
 .expo-web-*.err.log
 .expo-web-*.out.log
 *.log
+.codex-expo-web*.log
+expo-web*.log
 
 # macOS
 .DS_Store
@@ -46,6 +48,12 @@ example
 /ios
 /android
 
+# backend build & runtime
+backend/target/
+backend/src/main/resources/application.properties
+backend/src/main/resources/application-dev.properties
+backend/*.err
+backend/*.log
 
 *.pt
 *.env

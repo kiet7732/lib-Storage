@@ -26,22 +26,8 @@ export function BookCard({
 }: BookCardProps) {
   const responsive = useResponsiveLayout();
   const vertical = layout === 'vertical';
-  const titleSlotHeight = vertical ? Math.round(24 * responsive.typeScale) * 2 : undefined;
-  const authorSlotHeight = vertical ? Math.round(24 * responsive.typeScale) : undefined;
-  const textBlockMinHeight = vertical
-    ? (titleSlotHeight ?? 0) + (authorSlotHeight ?? 0) + 6
-    : undefined;
-  const metaBlockMinHeight = vertical
-    ? textBlockMinHeight
-      ? textBlockMinHeight + (statusLabel ? 52 : 0) + theme.spacing.sm
-      : undefined
-    : undefined;
-  const resolvedCoverWidth = coverWidth
-    ?? (vertical ? responsive.gridItemWidth : responsive.bookRowCoverWidth);
-  const resolvedCoverHeight = coverHeight
-    ?? (vertical
-      ? Math.round(resolvedCoverWidth * 1.39)
-      : responsive.bookRowCoverHeight);
+  const resolvedCoverWidth = coverWidth ?? (vertical ? responsive.gridItemWidth : responsive.bookRowCoverWidth);
+  const resolvedCoverHeight = coverHeight ?? (vertical ? Math.round(resolvedCoverWidth * 1.39) : responsive.bookRowCoverHeight);
 
   return (
     <Link href={{ pathname: '/books/[id]', params: { id: book.id } }} asChild>
@@ -50,48 +36,84 @@ export function BookCard({
           <View
             style={{
               flexDirection: vertical ? 'column' : 'row',
-              gap: theme.spacing.md,
-              minHeight: vertical ? resolvedCoverHeight + (metaBlockMinHeight ?? 0) : undefined,
-              borderRadius: theme.radius.lg,
-              borderCurve: 'continuous',
+              width: vertical ? resolvedCoverWidth : '100%',
               backgroundColor: theme.colors.surface,
-              padding: vertical ? 0 : theme.spacing.md,
-              opacity: pressed ? 0.84 : 1,
+              borderRadius: 16,
+              borderCurve: 'continuous',
+              overflow: 'hidden',
+              boxShadow: pressed ? theme.shadow.soft : '0px 8px 24px rgba(18, 25, 20, 0.08)',
+              borderWidth: 1,
+              borderColor: 'rgba(0,0,0,0.03)',
+              transform: [{ scale: pressed ? 0.97 : 1 }],
+              transition: 'all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
             }}
           >
-            <BookCover
-              uri={book.coverUrl}
-              width={resolvedCoverWidth}
-              height={resolvedCoverHeight}
-              radius={vertical ? theme.radius.md : 16}
-            />
+            <View style={{ position: 'relative' }}>
+              <BookCover
+                uri={book.coverUrl}
+                width={vertical ? '100%' : resolvedCoverWidth}
+                height={resolvedCoverHeight}
+                radius={0}
+              />
+              
+              {/* Overlay Status Chip */}
+              {statusLabel && vertical && (
+                <View style={{ position: 'absolute', top: 8, right: 8 }}>
+                  <View style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    paddingHorizontal: 10,
+                    paddingVertical: 4,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                    boxShadow: '0px 2px 8px rgba(0,0,0,0.1)'
+                  }}>
+                    <AppText variant="label" style={{ color: theme.colors.primary, fontSize: 11, fontWeight: '700' }}>
+                      {statusLabel}
+                    </AppText>
+                  </View>
+                </View>
+              )}
+            </View>
+
             <View
               style={{
                 flex: 1,
-                gap: 6,
-                minHeight: metaBlockMinHeight,
-                justifyContent: vertical ? 'space-between' : 'flex-start',
-                paddingLeft: theme.spacing.md - 6,
+                padding: 12,
+                justifyContent: 'space-between',
               }}
             >
-              <View style={{ gap: 6, minHeight: textBlockMinHeight}}>
-                <View style={{ minHeight: titleSlotHeight, maxHeight: titleSlotHeight }}>
-                  <AppText
-                    variant={vertical ? 'bodyStrong' : 'title'}
-                    numberOfLines={vertical ? 2 : 3}
-                    ellipsizeMode="tail"
-                    style={{ fontFamily: vertical ? theme.fonts.sansSemiBold : theme.fonts.sansBold }}
-                  >
-                    {book.title}
-                  </AppText>
-                </View>
-                <View style={{ minHeight: authorSlotHeight, justifyContent: 'flex-start' }}>
-                  <AppText tone="muted" numberOfLines={1} ellipsizeMode="tail">
-                    {book.author}
-                  </AppText>
-                </View>
+              <View style={{ gap: 4 }}>
+                <AppText
+                  variant="bodyStrong"
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                  style={{
+                    fontFamily: theme.fonts.sansSemiBold,
+                    fontSize: 15,
+                    lineHeight: 20,
+                    color: theme.colors.text,
+                  }}
+                >
+                  {book.title}
+                </AppText>
+                
+                <AppText 
+                  tone="muted" 
+                  numberOfLines={1} 
+                  ellipsizeMode="tail"
+                  style={{ fontSize: 13 }}
+                >
+                  {book.author}
+                </AppText>
               </View>
-              {statusLabel ? <StatusChip label={statusLabel} tone="success" /> : null}
+
+              {/* Horizontal Layout specific Status Chip */}
+              {statusLabel && !vertical && (
+                <View style={{ marginTop: 8, alignSelf: 'flex-start' }}>
+                  <StatusChip label={statusLabel} tone="success" />
+                </View>
+              )}
             </View>
           </View>
         )}

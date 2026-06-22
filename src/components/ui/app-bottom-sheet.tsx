@@ -1,5 +1,5 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
-import { Pressable, View } from 'react-native';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Pressable, View, LayoutChangeEvent } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   Easing,
@@ -22,6 +22,7 @@ type AppBottomSheetProps = {
   minHeight?: number;
   onClose: () => void;
   snapPoints?: number[];
+  dynamicHeight?: boolean;
 };
 
 const DEFAULT_SNAP_POINTS = [0.9, 0.74, 0.58];
@@ -47,19 +48,30 @@ export function AppBottomSheet({
   minHeight = 420,
   onClose,
   snapPoints = DEFAULT_SNAP_POINTS,
+  dynamicHeight = false,
 }: AppBottomSheetProps) {
   const layout = useResponsiveLayout();
   const closeGuardRef = useRef(false);
+  const [contentHeight, setContentHeight] = useState(0);
 
   const maxVisibleHeight = Math.max(layout.height - layout.insets.top - theme.spacing.lg, minHeight);
+  
   const snapTranslations = useMemo(() => {
+    if (dynamicHeight) {
+      if (contentHeight > 0) {
+        const measuredHeight = clamp(contentHeight + layout.insets.bottom + 40, minHeight, maxVisibleHeight);
+        return [maxVisibleHeight - measuredHeight];
+      }
+      return [maxVisibleHeight - minHeight];
+    }
+
     const resolvedHeights = [...snapPoints]
       .map((point) => clamp(layout.height * point, minHeight, maxVisibleHeight))
       .sort((left, right) => right - left)
       .filter((height, index, values) => index === 0 || Math.abs(values[index - 1] - height) > 8);
 
     return resolvedHeights.map((height) => maxVisibleHeight - height);
-  }, [layout.height, maxVisibleHeight, minHeight, snapPoints]);
+  }, [layout.height, layout.insets.bottom, maxVisibleHeight, minHeight, snapPoints, dynamicHeight, contentHeight]);
 
   const boundedInitialSnapIndex = clamp(initialSnapIndex, 0, Math.max(snapTranslations.length - 1, 0));
   const initialTranslation = snapTranslations[boundedInitialSnapIndex] ?? 0;
@@ -88,9 +100,8 @@ export function AppBottomSheet({
 
   useEffect(() => {
     closeGuardRef.current = false;
-    translateY.value = hiddenTranslation;
     translateY.value = withSpring(initialTranslation, SPRING_CONFIG);
-  }, [hiddenTranslation, initialTranslation, translateY]);
+  }, [initialTranslation, translateY]);
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -253,7 +264,16 @@ export function AppBottomSheet({
           </View>
         </GestureDetector>
 
-        <View style={{ flex: 1, minHeight: 0 }}>{children}</View>
+        <View 
+          style={{ flex: dynamicHeight ? undefined : 1, minHeight: 0 }}
+          onLayout={(e: LayoutChangeEvent) => {
+            if (dynamicHeight) {
+              setContentHeight(e.nativeEvent.layout.height);
+            }
+          }}
+        >
+          {children}
+        </View>
 
         {footer ? (
           <View
