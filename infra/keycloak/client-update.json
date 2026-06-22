@@ -1,0 +1,35 @@
+{
+  "id": "6931daef-f05f-4839-a820-02d65cd8359c",
+  "clientId": "lib-storage-mobile",
+  "enabled": true,
+  "publicClient": true,
+  "standardFlowEnabled": true,
+  "directAccessGrantsEnabled": false,
+  "redirectUris": [
+    "libstorage://auth/callback",
+    "http://localhost:8080/auth/callback",
+    "http://localhost:8080/login",
+    "http://127.0.0.1:8080/auth/callback",
+    "http://127.0.0.1:8080/login",
+    "http://localhost:8081/auth/callback",
+    "http://localhost:8081/login",
+    "http://127.0.0.1:8081/auth/callback",
+    "http://127.0.0.1:8081/login",
+    "http://localhost:8082/auth/callback",
+    "http://localhost:8082/login",
+    "http://127.0.0.1:8082/auth/callback",
+    "http://127.0.0.1:8082/login",
+    "http://localhost:8083/auth/callback",
+    "http://localhost:8083/login",
+    "http://127.0.0.1:8083/auth/callback",
+    "http://127.0.0.1:8083/login",
+    "http://localhost:19006/auth/callback",
+    "http://localhost:19006/login",
+    "http://127.0.0.1:19006/auth/callback",
+    "http://127.0.0.1:19006/login"
+  ],
+  "webOrigins": ["*"],
+  "attributes": {
+    "pkce.code.challenge.method": "S256"
+  }
+}

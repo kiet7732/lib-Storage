@@ -15,6 +15,7 @@ type AppButtonProps = {
   onPress?: () => void;
   iconName?: Parameters<typeof AppIcon>[0]['name'];
   variant?: ButtonVariant;
+  disabled?: boolean;
 };
 
 export function AppButton({
@@ -22,20 +23,29 @@ export function AppButton({
   onPress,
   iconName,
   variant = 'primary',
+  disabled = false,
 }: AppButtonProps) {
   const layout = useResponsiveLayout();
 
   const handlePress = async () => {
+    if (disabled) {
+      return;
+    }
+
     await selectionHaptic();
     onPress?.();
   };
 
   if (variant === 'primary') {
     return (
-      <Pressable onPress={handlePress}>
+      <Pressable onPress={handlePress} disabled={disabled}>
         {({ pressed }) => (
           <LinearGradient
-            colors={[theme.colors.primary, theme.colors.primaryStrong]}
+            colors={
+              disabled
+                ? [theme.colors.outline, theme.colors.outline]
+                : [theme.colors.primary, theme.colors.primaryStrong]
+            }
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{
@@ -48,7 +58,7 @@ export function AppButton({
               borderCurve: 'continuous',
               paddingHorizontal: theme.spacing.lg,
               paddingVertical: layout.isCompact ? 16 : 18,
-              opacity: pressed ? 0.94 : 1,
+              opacity: disabled ? 0.58 : pressed ? 0.94 : 1,
               boxShadow: theme.shadow.floating,
             }}
           >
@@ -63,7 +73,7 @@ export function AppButton({
   }
 
   return (
-    <Pressable onPress={handlePress}>
+    <Pressable onPress={handlePress} disabled={disabled}>
       {({ pressed }) => (
         <View
           style={{
@@ -79,7 +89,7 @@ export function AppButton({
             backgroundColor: variant === 'secondary' ? theme.colors.surface : 'transparent',
             borderWidth: variant === 'secondary' ? 1 : 0,
             borderColor: theme.colors.border,
-            opacity: pressed ? 0.75 : 1,
+            opacity: disabled ? 0.48 : pressed ? 0.75 : 1,
           }}
         >
           {iconName ? <AppIcon name={iconName} color={theme.colors.primary} size={20} /> : null}

@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   Book,
   BorrowedItem,
   HistoryEvent,
@@ -36,7 +36,7 @@ function findRequired<TItem>(
 }
 
 function formatCurrency(amount: number) {
-  return `${amount.toLocaleString('vi-VN')}Ä‘`;
+  return `${amount.toLocaleString('vi-VN')}đ`;
 }
 
 function formatDateToHistoryLabel(value: string) {
@@ -51,9 +51,9 @@ function formatDateToHistoryLabel(value: string) {
 
 function toStatusLabel(status: LibrarianRequest['status']) {
   return {
-    pending: 'Chá» phÃª duyá»‡t',
-    processing: 'Äang xá»­ lÃ½',
-    staging: 'Chá» xáº¿p giÃ¡',
+    pending: 'Chờ phê duyệt',
+    processing: 'Đang xử lý',
+    staging: 'Chờ xếp giá',
   }[status];
 }
 
@@ -81,7 +81,7 @@ function mapBook(ctx: QueryContext, bookId: string): Book {
     categories: record.categories.map((category) => category.label),
     summary: record.book.summary,
     copiesAvailable,
-    location: firstCopy && branch ? `${branch.name} - ${firstCopy.shelfCode}` : 'ChÆ°a phÃ¢n ká»‡',
+    location: firstCopy && branch ? `${branch.name} - ${firstCopy.shelfCode}` : 'Chưa phân kệ',
     coverUrl: record.book.coverUrl,
   };
 }
@@ -309,10 +309,10 @@ function mapInventoryItem(ctx: QueryContext, copyId: string): LibrarianInventory
           : 'available',
     statusLabel:
       copy.status === 'damaged'
-        ? 'BÃ¡o há»ng'
+        ? 'Báo hỏng'
         : copy.status === 'borrowed'
-          ? 'Äang mÆ°á»£n'
-          : 'Sáºµn sÃ ng',
+          ? 'Đang mượn'
+          : 'Sẵn sàng',
     statusTone:
       copy.status === 'damaged'
         ? 'danger'
@@ -336,7 +336,7 @@ function mapReturnItem(ctx: QueryContext, loanId: string): LibrarianReturnItem |
   const bucket =
     joined.loan.status === 'overdue'
       ? 'overdue'
-      : joined.loan.note?.toLowerCase().includes('hÃ´m nay')
+      : joined.loan.note?.toLowerCase().includes('hôm nay')
         ? 'dueToday'
         : null;
 
@@ -363,7 +363,7 @@ function mapReturnItem(ctx: QueryContext, loanId: string): LibrarianReturnItem |
     residence: joined.studentAccount.student.residence,
     dueDate: joined.loan.dueDate,
     bucket,
-    statusLabel: bucket === 'overdue' ? joined.loan.note ?? 'QuÃ¡ háº¡n' : 'Äáº¿n háº¡n hÃ´m nay',
+    statusLabel: bucket === 'overdue' ? joined.loan.note ?? 'Quá hạn' : 'Đến hạn hôm nay',
     fineAmount: formatCurrency(joined.loan.fineAmount ?? 0),
     fineAmountValue: joined.loan.fineAmount ?? 0,
     note: joined.loan.note,
@@ -407,7 +407,7 @@ function mapExportLog(ctx: QueryContext, jobId: string): LibrarianExportLog {
     fileName: job.fileName,
     createdByUserId: owner.id,
     createdLabel: job.createdLabel,
-    ownerLabel: `Táº¡o bá»Ÿi ${owner.fullName}`,
+    ownerLabel: `Tạo bởi ${owner.fullName}`,
     ownerName: owner.fullName,
     statusLabel: job.statusLabel,
     statusTone: job.statusTone,
@@ -435,28 +435,28 @@ export function selectLibrarianWorkspaceSnapshot(): LibrarianWorkspaceSnapshot {
     librarianStats: [
       {
         id: 'pending-borrow',
-        label: 'YÃªu cáº§u mÆ°á»£n',
+        label: 'Yêu cầu mượn',
         value: librarianRequests.filter((entry) => entry.kind === 'borrow').length,
         icon: 'task',
         tone: 'primary',
       },
       {
         id: 'pending-renew',
-        label: 'YÃªu cáº§u gia háº¡n',
+        label: 'Yêu cầu gia hạn',
         value: librarianRequests.filter((entry) => entry.kind === 'renew').length,
         icon: 'history',
         tone: 'warning',
       },
       {
         id: 'overdue',
-        label: 'SÃ¡ch quÃ¡ háº¡n',
+        label: 'Sách quá hạn',
         value: librarianReturnItems.filter((entry) => entry.bucket === 'overdue').length,
         icon: 'warning',
         tone: 'danger',
       },
       {
         id: 'returned',
-        label: 'Äáº¿n háº¡n hÃ´m nay',
+        label: 'Đến hạn hôm nay',
         value: librarianReturnItems.filter((entry) => entry.bucket === 'dueToday').length,
         icon: 'calendar',
         tone: 'neutral',
